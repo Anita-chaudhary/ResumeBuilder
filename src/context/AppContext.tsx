@@ -1,4 +1,4 @@
-import React, { createContext } from "react";
+import React, { createContext, useContext, useState } from "react";
 
 type PersonalDetails = {
   name: string;
@@ -73,4 +73,82 @@ type AppContextType = {
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
-export const AppProvider:React.FC<{children :  React.ReactNode}>
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  const [state, setState] = useState<AppState>({
+    personalDetails: null,
+    objective: null,
+    skill: [],
+    projects: [],
+    experiences: [],
+    hobbies: [],
+    qualification: [],
+    languages: [],
+  });
+
+  // Save Details to AsyncStorage
+
+  const updatePersonalDetails = (details: PersonalDetails) => {
+    setState((prev) => ({ ...prev, personalDetails: details }));
+  };
+
+  const updateObjective = (objective: Objective) => {
+    setState((prev) => ({ ...prev, objective: objective }));
+  };
+
+  const addSkill = (skill: Skill) => {
+    setState((prev) => ({ ...prev, skill: [...prev.skill, skill] }));
+  };
+
+  const addProject = (project: Project) => {
+    setState((prev) => ({ ...prev, projects: [...prev.projects, project] }));
+  };
+
+  const addExperience = (experience: Experience) => {
+    setState((prev) => ({
+      ...prev,
+      experiences: [...prev.experiences, experience],
+    }));
+  };
+
+  const addHobby = (hobby: Hobby) => {
+    setState((prev) => ({ ...prev, hobbies: [...prev.hobbies, hobby] }));
+  };
+
+  const addQualification = (qualification: Qualification) => {
+    setState((prev) => ({
+      ...prev,
+      qualification: [...prev.qualification, qualification],
+    }));
+  };
+  const addLanguage = (language: Language) => {
+    setState((prev) => ({ ...prev, languages: [...prev.languages, language] }));
+  };
+
+  return (
+    <AppContext.Provider
+      value={{
+        state,
+        updatePersonalDetails,
+        updateObjective,
+        addSkill,
+        addProject,
+        addExperience,
+        addHobby,
+        addQualification,
+        addLanguage,
+      }}
+    >
+      {children}
+    </AppContext.Provider>
+  );
+};
+
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if (!context) {
+    throw new Error("useAppContext must be used within an AppProvider");
+  }
+  return context;
+};
